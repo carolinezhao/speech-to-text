@@ -1,0 +1,31 @@
+{
+  "name": "Speech to Text",
+  "description": "Convert speech to text in real-time as input to the current page.",
+  "version": "1.0",
+  "manifest_version": 2,
+  "permissions": ["windows", "activeTab", "storage"],
+  "options_page": "options.html",
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "img/mic.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "icons": {
+    "16": "img/mic.png",
+    "32": "img/mic.png",
+    "48": "img/mic.png",
+    "128": "img/mic.png"
+  },
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E",
+        "mac": "MacCtrl+Shift+E"
+      },
+      "description": "Opens popup.html"
+    }
+  }
+}
