@@ -1,0 +1,33 @@
+body {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, Roboto;
+  color: #2c3e50;
+  width: 50%;
+  margin: auto;
+  font-size: 14px;
+}
+
+section {
+  border-bottom: 1px solid #bfcbd9;
+  padding-bottom: 15px;
+}
+
+div {
+  line-height: 35px;
+}
+
+input[type='button'] {
+  outline: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-color: #4D8CF8;
+  border: 1px solid #4081F0;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 14px;
+  height: 25px;
+  width: 60px;
+}
+
+label {
+  margin-left: 3px;
+}
