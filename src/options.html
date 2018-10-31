@@ -12,8 +12,10 @@
     <section>
       <h2>设置</h2>
       <div>麦克风：<input type="button" id="enable_mic" value="启用"></div>
-      <div>更改麦克风权限：chrome://settings/content/microphone</div>
-      <div>连续输入：<input type="button" id="if_continuous" value="启用"><label>（默认情况下，语音识别会在语句停顿处结束）</label></div>
+      <div id="mic_tip">更改麦克风权限：点击地址栏中的摄像机图标更改设置 (刷新) 或者到 chrome://settings/content/microphone 设置。</div>
+      <div><input type="checkbox" id="continuous"><label for="continuous">连续输入</label></div>
+      <!-- <div>连续输入：<input type="checkbox" id="continuous" class="check-switch check-switch-anim"></div> -->
+      <div>默认情况下，语音识别会在语句停顿处结束。如果您需要输入较长文本，请开启连续输入。</div>
     </section>
     <section>
       <h2>帮助</h2>

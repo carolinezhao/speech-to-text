@@ -1,7 +1,7 @@
 body {
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, Roboto;
   color: #2c3e50;
-  width: 50%;
+  width: 60%;
   margin: auto;
   font-size: 14px;
 }
@@ -30,4 +30,13 @@ input[type='button'] {
 
 label {
   margin-left: 3px;
+}
+
+#mic_tip {
+  display: none;
+}
+
+:disabled {
+  opacity: .7;
+  cursor: not-allowed;
 }
