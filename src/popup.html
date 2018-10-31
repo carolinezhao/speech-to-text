@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+
+<body>
+  <header class="flex-center">
+    <p class="headline">Speech To Text</p>
+  </header>
+  <section class="flex-col top-section">
+    <div class="info">
+      <span id="msg_span"></span>
+    </div>
+    <div class="icon-wrap">
+      <img id="start_button" src="img/inactive.png" alt="Start">
+    </div>
+    <div id="results">
+      <span id="final_span" class="final"></span>
+      <span id="interim_span" class="interim"></span>
+    </div>
+    <div>
+      <input type="button" id="clear_button" value="clear">
+    </div>
+  </section>
+  <section class="flex-col bottom-section">
+    <input type="button" id="page_button" class="button" value="在网页中输入">
+    <p class="info">点击上方按钮后，在页面中激活文本框，背景为浅蓝色时表示正在录音。</p>
+    <a class="info" id="to_options">Options & Help</a>
+  </section>
+</body>
+
+</html>
