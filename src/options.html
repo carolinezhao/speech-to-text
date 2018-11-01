@@ -22,13 +22,23 @@
         <select id="select_language"></select>
         <select id="select_dialect"></select>
       </div>
-      <div>不设置输入语言时，默认使用浏览器设置。</div>
-      <div class="item">设置插件语言 (in work progress)</label></div>
+      <div>不设置输入语言时，默认使用网页设置。</div>
+      <div class="item">设置插件语言 (work in progress)</label></div>
     </section>
     <section>
       <h2>帮助</h2>
+      <div>使用环境：Chrome 版本 25 及以上。</div>
+      <div>麦克风权限：插件和各个网页的麦克风权限都是独立的，首次使用均需要授权。</div>
+      <div>在网页中使用：
+        <ul>         
+          <li>仅支持在 HTTPS 协议的网页中使用。对于不支持的网页，可以在插件中输入，然后复制到目标区域。</li>
+          <li>如果刷新网页，需要再次点击“在网页中输入”按钮。为保护用户隐私，网页脚本不是持续运行的。</li>
+          <li>不支持使用的文本框类型：密码项等。</li>
+        </ul>
+      </div>
+      <div>源码：<a href="https://github.com/carolinezhao/speech-to-text">GitHub</a></div>
     </section>
-    <section>
+    <section class="last">
       <h2>隐私</h2>
       <div>API 如何使用语音：<a href="https://www.google.com/chrome/privacy/whitepaper.html#speech">Chrome Privacy Whitepaper</a></div>
     </section>

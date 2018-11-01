@@ -3,7 +3,7 @@
   "description": "Convert speech to text in real-time as input to the current page.",
   "version": "1.0",
   "manifest_version": 2,
-  "permissions": ["windows", "activeTab", "storage"],
+  "permissions": ["windows", "tabs", "activeTab", "storage"],
   "options_page": "options.html",
   "browser_action": {
     "default_popup": "popup.html",
@@ -13,12 +13,6 @@
     "page": "background.html",
     "persistent": false
   },
-  "content_scripts": [
-    {
-      "matches": ["https://www.google.com/*"],
-      "js": ["contentScript.bundle.js"]
-    }
-  ],
   "icons": {
     "128": "icon-128.png"
   },
