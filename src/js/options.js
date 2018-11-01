@@ -97,7 +97,7 @@ chrome.storage.local.get(null, data => {
 
 /* Event */
 
-checkMic();
+checkMic(); // 每次都要检查，因为多处可以设置麦克状态，仅检查 storage 不够。
 enable_mic.addEventListener('click', checkMic);
 
 continuous.addEventListener('change', () => {

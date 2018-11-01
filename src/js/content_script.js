@@ -121,7 +121,6 @@ function startRecord(event) {
     return;
   }
   final_transcript = '';
-  // recognition.lang = select_dialect.value; // auto
   recognition.start();
   ignore_onend = false;
   // event.target.value = '';
