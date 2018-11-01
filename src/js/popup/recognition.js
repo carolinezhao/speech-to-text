@@ -1,17 +1,20 @@
 export function initRecognition(env) {
   var recognition = new webkitSpeechRecognition();
   recognition.interimResults = true;
-  if (env === 'web') {
-    recognition.continuous = false; // default
-    chrome.storage.local.get(['ifContinuous'], data => {
-      if ('ifContinuous' in data) {
-        recognition.continuous = true;
-      }
-      // console.log(recognition);
-    });
-  }
-  if (env === 'extension') {
-    recognition.continuous = true;
-  }
+
+  chrome.storage.local.get(null, data => {
+    // console.log(data);
+    if ('ifSetLang' in data) {
+      recognition.lang = data.dialect;
+    }
+    if (env === 'web') {
+      recognition.continuous = ('ifContinuous' in data);
+    }
+    if (env === 'extension') {
+      recognition.continuous = true;
+    }
+  });
+
+  // console.log(recognition);
   return recognition;
 }
