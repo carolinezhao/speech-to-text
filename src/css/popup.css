@@ -71,3 +71,8 @@ header {
   padding: 8px 24px;
   text-shadow: 1px 1px 1px #4D8CF8;
 }
+
+#page_button:hover {
+  background-color: #3578EA;
+  transition: all .5s;
+}
