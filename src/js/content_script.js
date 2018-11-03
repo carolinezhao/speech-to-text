@@ -9,6 +9,12 @@ import {
   linebreak
 } from "./popup/format";
 
+let inputNodes = document.querySelectorAll(createSelector());
+let recognition = initRecognition('web');
+let recognizing = false;
+let final_transcript = '';
+let zhihu = window.location.href.includes('zhihu');
+
 /* Enable Microphone */
 
 enableMic()
@@ -20,110 +26,120 @@ enableMic()
     console.log(err);
   });
 
-
-/* Get <input> nodes of the current page */
-
-var targetNode; // 目标文本框
-var originColor;
+/* Init focus events */
 
 if (document) {
-  bindEvent();
+  bindEvent(inputNodes);
 }
 
-function createSelector() {
-  var inputTypeList = ['text', 'search', 'tel', 'email'];
-  var selector = 'textarea, ';
-  inputTypeList.forEach((item, index, array) => {
-    selector += `input[type=${item}]`;
-    if (index !== array.length - 1) {
-      selector += ', ';
-    }
-  });
-  // console.log(selector);
-  return selector;
-}
+/* Remove events when receive notice from extension */
 
-function bindEvent() {
-  var inputNodes = document.querySelectorAll(createSelector());
-  // console.log(inputNodes);
-  if (inputNodes.length) {
-    inputNodes.forEach(item => {
-      item.onfocus = event => {
-        startRecord(event);
-        targetNode = event.target;
-      };
-    })
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.stop) {
+    console.log('stop');
+    removeEvent(inputNodes);
+    // sendResponse(''); // notify sender
+  }
+})
+
+function bindEvent(nodeList) {
+  if (nodeList.length) {
+    nodeList.forEach(item => item.addEventListener('focus', toggleRecord));
   }
 }
 
-/* UX */
-
-function highlightStyle(node) {
-  originColor = node.style.backgroundColor;
-  node.style.backgroundColor = '#DEE8FC';
+function removeEvent(nodeList) {
+  if (nodeList.length) {
+    nodeList.forEach(item => {
+      recognition.stop();
+      item.removeEventListener('focus', toggleRecord);
+    });
+  }
 }
 
-function restoreStyle(node) {
-  node.style.backgroundColor = originColor;
-}
+/* Speech recognition handler */
 
-
-/* Web Speech API */
-
-var final_transcript = '';
-var recognizing = false; // status
-var ignore_onend;
-var start_timestamp;
-
-var recognition = initRecognition('web');
-recognition.onstart = function () {
-  recognizing = true;
-  highlightStyle(targetNode);
-};
-recognition.onerror = function (event) {
-  // 
-};
-recognition.onend = function () {
-  recognizing = false;
-  restoreStyle(targetNode);
-  if (ignore_onend) {
-    return;
-  }
-};
-recognition.onresult = function (event) {
-  var interim_transcript = '';
-  for (var i = event.resultIndex; i < event.results.length; ++i) {
-    if (event.results[i].isFinal) {
-      final_transcript += event.results[i][0].transcript;
-    } else {
-      interim_transcript += event.results[i][0].transcript;
-    }
-  }
-  final_transcript = linebreak(capitalize(final_transcript));
-  // console.log(interim_transcript);
-  // targetNode.value = linebreak(interim_transcript);
-
-  if (recognition.continuous) {
-    targetNode.value = final_transcript;
-  } else {
-    if (targetNode.value.length && final_transcript) {
-      targetNode.value += ` ${final_transcript}`;
-    } else {
-      targetNode.value += final_transcript;
-    }
-  }
-};
-
-function startRecord(event) {
-  // console.log(event.target);
+function toggleRecord(focusEvent) {
   if (recognizing) {
     recognition.stop();
     return;
   }
   final_transcript = '';
   recognition.start();
-  ignore_onend = false;
-  // event.target.value = '';
-  // interim_span.value = '';
-  start_timestamp = event.timeStamp;
+  // var start_timestamp = focusEvent.timeStamp;
+  var activeNode = focusEvent.target;
+  var originBgColor = activeNode.style.backgroundColor;
+  // console.log(activeNode);
+
+  recognition.onstart = function () {
+    recognizing = true;
+    toggleBgColor(activeNode, '#DEE8FC');
+  };
+  recognition.onerror = function (event) {
+    toggleBgColor(activeNode, originBgColor);
+  };
+  recognition.onend = function () {
+    recognizing = false;
+    toggleBgColor(activeNode, originBgColor);
+  };
+  recognition.onresult = function (event) {
+    if (recognition.continuous) {
+      final_transcript = '';
+    }
+    var interim_transcript = '';
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        final_transcript += event.results[i][0].transcript;
+      } else {
+        interim_transcript += event.results[i][0].transcript;
+      }
+    }
+    // console.log(interim_transcript);
+    output(final_transcript, activeNode);
+  };
+}
+
+/* Insert results into nodes */
+
+function output(text, targetNode) {
+  if (text.length) {
+    text = capitalize(text);
+    if (targetNode.nodeName === 'DIV') { // 写入页面元素中
+      var innerNode = getInnerNode(targetNode);
+      console.log(innerNode);
+      if (zhihu && innerNode.firstChild.nodeName === 'BR') { // 知乎
+        innerNode.innerHTML = `<span data-text="true">${text}</span>`;
+      } else {
+        innerNode.innerHTML += text;
+      }
+    } else { // 写入 value 属性
+      targetNode.value += linebreak(text);
+    }
+  }
+}
+
+/* Get available nodes of the current page */
+
+function createSelector() {
+  let inputTypes = ['text', 'search', 'tel', 'email'];
+  let inputArr = inputTypes.map(item => `input[type=${item}]`);
+  let textareaArr = ['textarea'];
+  let divArr = ['div[contenteditable=true]'];
+  let selector = inputArr.concat(textareaArr, divArr).join(',');
+  // console.log(selector);
+  return selector;
+}
+
+/* Get the deepest childNode (except <br>) */
+
+function getInnerNode(node) {
+  if (node.lastElementChild !== null && node.lastElementChild.nodeName !== 'BR') {
+    return getInnerNode(node.lastElementChild);
+  } else {
+    return node;
+  }
+}
+
+function toggleBgColor(node, color) {
+  node.style.backgroundColor = color;
 }
