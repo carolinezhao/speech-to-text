@@ -15,14 +15,32 @@ a {
   color: #4D8CF8;
 }
 
-.button {
+.btn {
   cursor: pointer;
   box-sizing: border-box;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.main-btn {
   background-color: #4D8CF8;
   border: 1px solid #4081F0;
-  border-radius: 5px;
-  color: #fff;
-  font-size: 14px;
+}
+
+.main-btn:hover {
+  background-color: #3578EA;
+  transition: all .5s;
+}
+
+.stop-btn {
+  background-color: #F87575;
+  border: 1px solid #F36262;
+}
+
+.stop-btn:hover {
+  background-color: #F36262;
+  transition: all .5s;
 }
 
 :disabled {
