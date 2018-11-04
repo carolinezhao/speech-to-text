@@ -14,31 +14,33 @@ import {
   message
 } from "./popup/message";
 
-/* Execute script for webpage */
-
 let page_button = document.getElementById('page_button');
-page_button.onclick = function () {
-  chrome.tabs.executeScript(null, {
-    file: "contentScript.bundle.js"
-  });
-  window.close();
-}
+let msg_span = document.getElementById('msg_span');
+let msg = message();
+let tabId;
+let workInTab;
 
 /* Message */
-
-let msg = message();
-let msg_span = document.getElementById('msg_span');
 
 function showMsg(string) {
   msg_span.innerHTML = msg[string];
 }
 
-/* Check Microphone */
+/* Initial settings */
 
-// 插件页不能直接请求媒体权限，需要到 options 页设置。
-function checkMic() {
-  chrome.storage.local.get('micStatus', data => {
+function getTabId() {
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, tabs => {
+    tabId = tabs[0].id;
+  })
+}
+
+function initSettings() {
+  chrome.storage.local.get(['micStatus', 'workInTab'], data => {
     console.log(data);
+    // check microphone
     if ('micStatus' in data) {
       if (data.micStatus) {
         showMsg('start');
@@ -46,9 +48,64 @@ function checkMic() {
         showMsg('blocked');
       }
     } else {
+      // 插件页不能直接请求媒体权限，需要到 options 页设置。
       showMsg('enableMic');
     }
+    // check content script status
+    workInTab = data.workInTab;
+    console.log(workInTab);
+    if (`${tabId}` in workInTab) {
+      if (workInTab[tabId]) {
+        stopBtn(page_button);
+      } else {
+        startBtn(page_button);
+      }
+    } else {
+      startBtn(page_button);
+    }
   })
+}
+
+function startBtn(btn) {
+  btn.value = "在网页中输入";
+  btn.classList.remove('stop-btn');
+  btn.addEventListener('click', runContentScript);
+}
+
+function stopBtn(btn) {
+  btn.value = "停止在网页中输入";
+  btn.classList.add('stop-btn');
+  btn.addEventListener('click', stopWorkInTab);
+}
+
+/* Injects script into the current page */
+
+function runContentScript() {
+  chrome.tabs.executeScript(null, { // tabId, default current
+    file: "contentScript.bundle.js"
+  });
+  changeStatus(true);
+  window.close();
+  // stopBtn(page_button);
+}
+
+function stopWorkInTab() {
+  // extension 向内容脚本发消息
+  chrome.tabs.sendMessage(tabId, {
+    stop: true
+  }, (response) => {
+    if (response === 'done') {
+      changeStatus(false);
+      startBtn(page_button);
+    }
+  });
+}
+
+function changeStatus(boolean) {
+  workInTab[tabId] = boolean;
+  chrome.storage.local.set({
+    workInTab: workInTab
+  });
 }
 
 /* Web Speech API */
@@ -72,7 +129,8 @@ function upgrade() {
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
 } else {
-  checkMic();
+  getTabId();
+  initSettings();
   var recognition = initRecognition('extension');
   recognition.onstart = function () {
     recognizing = true;
