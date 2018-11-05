@@ -4,26 +4,47 @@ import "../img/active.png";
 import "../img/start.png";
 import "../img/inactive.png";
 import {
-  initRecognition
-} from "./popup/recognition";
-import {
+  initRecognition,
   capitalize,
   linebreak
-} from "./popup/format";
+} from "./popup/recognition";
 import {
   message
 } from "./popup/message";
 
-let page_button = document.getElementById('page_button');
-let msg_span = document.getElementById('msg_span');
-let msg = message();
+let msgSpan = document.getElementById('msgSpan');
+let micBtn = document.getElementById('micBtn');
+let finalSpan = document.getElementById('finalSpan');
+let interimSpan = document.getElementById('interimSpan');
+
+let pageBtn = document.getElementById('pageBtn');
 let tabId;
 let workInTab;
 
-/* Message */
+let recognition = initRecognition('extension');
+let final_transcript = '';
+let recognizing = false;
+// let ignore_onend;
+// let start_timestamp;
+
+/* Check if API is available */
+
+if (!('webkitSpeechRecognition' in window)) {
+  upgrade();
+} else {
+  getTabId();
+  initSettings();
+  micBtn.addEventListener('click', toggleRecord);
+}
+
+function upgrade() {
+  micBtn.style.visibility = 'hidden';
+  showMsg('upgrade');
+  pageBtn.setAttribute('disabled', 'disabled');
+}
 
 function showMsg(string) {
-  msg_span.innerHTML = msg[string];
+  msgSpan.innerHTML = message[string];
 }
 
 /* Initial settings */
@@ -48,31 +69,29 @@ function initSettings() {
         showMsg('blocked');
       }
     } else {
-      // 插件页不能直接请求媒体权限，需要到 options 页设置。
       showMsg('enableMic');
     }
     // check content script status
     workInTab = data.workInTab;
-    console.log(workInTab);
     if (`${tabId}` in workInTab) {
       if (workInTab[tabId]) {
-        stopBtn(page_button);
+        showStopBtn(pageBtn);
       } else {
-        startBtn(page_button);
+        showStartBtn(pageBtn);
       }
     } else {
-      startBtn(page_button);
+      showStartBtn(pageBtn);
     }
   })
 }
 
-function startBtn(btn) {
-  btn.value = "在网页中输入";
+function showStartBtn(btn) {
+  btn.value = "开始在网页中输入";
   btn.classList.remove('stop-btn');
   btn.addEventListener('click', runContentScript);
 }
 
-function stopBtn(btn) {
+function showStopBtn(btn) {
   btn.value = "停止在网页中输入";
   btn.classList.add('stop-btn');
   btn.addEventListener('click', stopWorkInTab);
@@ -86,17 +105,17 @@ function runContentScript() {
   });
   changeStatus(true);
   window.close();
-  // stopBtn(page_button);
+  // showStopBtn(pageBtn);
 }
 
 function stopWorkInTab() {
-  // extension 向内容脚本发消息
+  // from extension to content script
   chrome.tabs.sendMessage(tabId, {
     stop: true
   }, (response) => {
     if (response === 'done') {
       changeStatus(false);
-      startBtn(page_button);
+      showStartBtn(pageBtn);
     }
   });
 }
@@ -110,48 +129,38 @@ function changeStatus(boolean) {
 
 /* Web Speech API */
 
-let start_button = document.getElementById('start_button');
-start_button.addEventListener('click', startRecord);
+function toggleRecord(clickEvent) {
+  if (recognizing) {
+    recognition.stop();
+    showMsg('start');
+    return;
+  }
+  final_transcript = '';
+  recognition.start();
+  finalSpan.innerHTML = '';
+  interimSpan.innerHTML = '';
+  micBtn.src = 'active.png';
+  let ignore_onend = false;
+  let start_timestamp = clickEvent.timeStamp;
 
-let final_transcript = '';
-let recognizing = false;
-let ignore_onend;
-let start_timestamp;
-let final_span = document.getElementById('final_span');
-let interim_span = document.getElementById('interim_span');
-
-function upgrade() {
-  start_button.style.visibility = 'hidden';
-  showMsg('upgrade');
-  page_button.setAttribute('disabled', 'disabled');
-}
-
-if (!('webkitSpeechRecognition' in window)) {
-  upgrade();
-} else {
-  getTabId();
-  initSettings();
-  var recognition = initRecognition('extension');
   recognition.onstart = function () {
     recognizing = true;
     showMsg('speak');
-    start_button.src = 'start.png';
+    micBtn.src = 'start.png';
   };
   recognition.onerror = function (event) {
+    micBtn.src = 'inactive.png';
     if (event.error == 'no-speech') {
-      start_button.src = 'inactive.png';
       showMsg('noSpeech');
       ignore_onend = true;
     }
     if (event.error == 'audio-capture') {
-      start_button.src = 'inactive.png';
       showMsg('noMicrophone');
       ignore_onend = true;
     }
     if (event.error == 'not-allowed') {
       if (event.timeStamp - start_timestamp < 100) {
         showMsg('blocked');
-        start_button.src = 'inactive.png';
       } else {
         showMsg('denied');
       }
@@ -163,7 +172,7 @@ if (!('webkitSpeechRecognition' in window)) {
     if (ignore_onend) {
       return;
     }
-    start_button.src = 'inactive.png';
+    micBtn.src = 'inactive.png';
     showMsg('copy');
     if (!final_transcript) {
       showMsg('start');
@@ -172,7 +181,7 @@ if (!('webkitSpeechRecognition' in window)) {
     if (window.getSelection) {
       window.getSelection().removeAllRanges();
       var range = document.createRange();
-      range.selectNode(final_span);
+      range.selectNode(finalSpan);
       window.getSelection().addRange(range);
     }
   };
@@ -185,36 +194,25 @@ if (!('webkitSpeechRecognition' in window)) {
         interim_transcript += event.results[i][0].transcript;
       }
     }
-    final_transcript = capitalize(final_transcript);
-    final_span.innerHTML = linebreak(final_transcript);
-    interim_span.innerHTML = linebreak(interim_transcript);
+    finalSpan.innerHTML = linebreak(capitalize(final_transcript));
+    interimSpan.innerHTML = linebreak(interim_transcript);
   };
 }
 
-function startRecord(event) {
-  if (recognizing) {
-    recognition.stop();
-    showMsg('start');
-    return;
-  }
-  final_transcript = '';
-  recognition.start();
-  ignore_onend = false;
-  final_span.innerHTML = '';
-  interim_span.innerHTML = '';
-  start_button.src = 'active.png';
-  start_timestamp = event.timeStamp;
-}
+/* Empty results */
 
-document.getElementById('clear_button').onclick = function () {
+document.getElementById('clearBtn').onclick = function () {
   final_transcript = '';
-  final_span.innerHTML = '';
-  interim_span.innerHTML = '';
+  finalSpan.innerHTML = '';
+  interimSpan.innerHTML = '';
+  if (!recognizing) {
+    showMsg('start');
+  }
 }
 
 /* To options page */
 
-document.getElementById('to_options').onclick = function () {
+document.getElementById('toOptions').onclick = function () {
   chrome.tabs.create({
     url: chrome.extension.getURL("options.html"),
     selected: true
