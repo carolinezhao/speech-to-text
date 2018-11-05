@@ -11,17 +11,16 @@
     <h1>Speech to Text Options</h1>
     <section>
       <h2>设置</h2>
-      <div>麦克风：<input type="button" id="enable_mic" class="btn main-btn small-btn" value="启用"></div>
-      <div id="mic_tip">更改麦克风权限：点击地址栏中的摄像机图标更改设置或者到 chrome://settings/content/microphone 设置。</div>
-      <div class="item"><input type="checkbox" id="continuous"><label for="continuous">连续输入</label></div>
-      <!-- <div>连续输入：<input type="checkbox" id="continuous" class="check-switch check-switch-anim"></div> -->
+      <div><span class="item-title">麦克风：</span><input type="button" id="micBtn" class="btn main-btn small-btn" value="启用"></div>
+      <div id="micTip">更改麦克风权限：点击地址栏中的摄像机图标更改设置或者到 chrome://settings/content/microphone 设置。</div>
+      <div class="item"><input type="checkbox" id="continuous"><label for="continuous" class="item-title">连续输入</label></div>
       <div>在网页中使用时，语音识别默认会在语句停顿处结束。如果需要输入较长文本，请开启连续输入。</div>
       <div>在插件中使用时，默认为连续输入。</div>
-      <div>文本框背景（网页中）或麦克风（插件中）变为蓝色时表示正在录音，再次激活文本框或点击麦克风立即结束录音。</div>
-      <div class="item"><input type="checkbox" id="set_lang"><label for="set_lang">设置输入语言</label></div>
-      <div>语言：
-        <select id="select_language"></select>
-        <select id="select_dialect"></select>
+      <div>文本框背景（网页中）或麦克风图标（插件中）变为蓝色时表示正在录音，再次激活文本框或点击麦克风立即结束录音。</div>
+      <div class="item"><input type="checkbox" id="lang"><label for="lang" class="item-title">设置输入语言</label></div>
+      <div><span class="item-title">语言：</span>
+        <select id="langSelect"></select>
+        <select id="dialectSelect"></select>
       </div>
       <div>不设置输入语言时，默认使用浏览器和网页设置。</div>
       <div class="item">设置插件语言 (work in progress)</label></div>

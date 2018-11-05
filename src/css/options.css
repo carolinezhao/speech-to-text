@@ -2,6 +2,7 @@ body {
   width: 60%;
   margin: 0 auto 30px;
   font-size: 14px;
+  font-weight: 300;
 }
 
 section:not(.last) {
@@ -25,11 +26,16 @@ label {
   margin-top: 15px;
 }
 
+.item-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
 .small-btn {
   height: 25px;
   width: 60px;
 }
 
-#mic_tip {
+#micTip {
   display: none;
 }
