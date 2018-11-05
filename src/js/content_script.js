@@ -2,17 +2,17 @@ import {
   enableMic
 } from "./popup/media";
 import {
-  initRecognition
-} from "./popup/recognition";
-import {
+  initRecognition,
   capitalize,
   linebreak
-} from "./popup/format";
+} from "./popup/recognition";
 
 let inputNodes = document.querySelectorAll(createSelector());
 let recognition = initRecognition('web');
 let recognizing = false;
 let final_transcript = '';
+let activeNode;
+let originBgColor;
 let zhihu = window.location.href.includes('zhihu');
 
 /* Enable Microphone */
@@ -34,11 +34,11 @@ if (document) {
 
 /* Remove events when receive notice from extension */
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.stop) {
     console.log('stop');
     removeEvent(inputNodes);
-    // sendResponse(''); // notify sender
+    sendResponse('done');
   }
 })
 
@@ -51,7 +51,10 @@ function bindEvent(nodeList) {
 function removeEvent(nodeList) {
   if (nodeList.length) {
     nodeList.forEach(item => {
-      recognition.stop();
+      if (recognizing) {
+        recognition.stop();
+        toggleBgColor(activeNode, originBgColor);
+      }
       item.removeEventListener('focus', toggleRecord);
     });
   }
@@ -67,8 +70,8 @@ function toggleRecord(focusEvent) {
   final_transcript = '';
   recognition.start();
   // var start_timestamp = focusEvent.timeStamp;
-  var activeNode = focusEvent.target;
-  var originBgColor = activeNode.style.backgroundColor;
+  activeNode = focusEvent.target;
+  originBgColor = activeNode.style.backgroundColor;
   // console.log(activeNode);
 
   recognition.onstart = function () {
