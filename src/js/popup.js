@@ -18,6 +18,7 @@ let finalSpan = document.getElementById('finalSpan');
 let interimSpan = document.getElementById('interimSpan');
 
 let pageBtn = document.getElementById('pageBtn');
+let pageBtnTip = document.getElementById('pageBtnTip');
 let tabId;
 let workInTab;
 
@@ -32,7 +33,7 @@ let recognizing = false;
 if (!('webkitSpeechRecognition' in window)) {
   upgrade();
 } else {
-  getTabId();
+  getTabInfo();
   initSettings();
   micBtn.addEventListener('click', toggleRecord);
 }
@@ -41,6 +42,7 @@ function upgrade() {
   micBtn.style.visibility = 'hidden';
   showMsg('upgrade');
   pageBtn.setAttribute('disabled', 'disabled');
+  pageBtnTip.innerHTML = "请升级浏览器后使用。";
 }
 
 function showMsg(string) {
@@ -49,12 +51,22 @@ function showMsg(string) {
 
 /* Initial settings */
 
-function getTabId() {
+function getTabInfo() {
   chrome.tabs.query({
     active: true,
     currentWindow: true
   }, tabs => {
-    tabId = tabs[0].id;
+    let currentTab = tabs[0];
+    tabId = currentTab.id;
+    // console.log(currentTab.url);
+    if (!currentTab.url.startsWith('https')) {
+      pageBtn.setAttribute('disabled', 'disabled');
+      pageBtnTip.innerHTML = "此网页使用的协议不支持语音输入。请在插件中使用。";
+    }
+    if (currentTab.status === 'loading') {
+      pageBtn.setAttribute('disabled', 'disabled');
+      pageBtnTip.innerHTML = "网页未加载完全，请刷新。";
+    }
   })
 }
 
