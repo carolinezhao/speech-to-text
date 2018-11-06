@@ -16,7 +16,6 @@
       <div class="item"><input type="checkbox" id="continuous"><label for="continuous" class="item-title">连续输入</label></div>
       <div>在网页中使用时，语音识别默认会在语句停顿处结束。如果需要输入较长文本，请开启连续输入。</div>
       <div>在插件中使用时，默认为连续输入。</div>
-      <div>文本框背景（网页中）或麦克风图标（插件中）变为蓝色时表示正在录音，再次激活文本框或点击麦克风立即结束录音。</div>
       <div class="item"><input type="checkbox" id="lang"><label for="lang" class="item-title">设置输入语言</label></div>
       <div><span class="item-title">语言：</span>
         <select id="langSelect"></select>
@@ -29,15 +28,18 @@
       <h2>帮助</h2>
       <div>使用环境：Chrome 版本 25 及以上。能连接 Google。</div>
       <div>麦克风权限：插件和各个网页的麦克风权限都是独立的，首次使用均需要授权。</div>
+      <div>转换效果：语音识别需要一点时间，文本显示可能略有延迟。为得到更好的识别效果，请您语速平稳，吐字清晰。</div>
       <div>在网页中使用：
         <ul>
-          <li>如果刷新网页，需要再次点击“在网页中输入”按钮。为保护用户隐私，网页脚本不是持续运行的。</li>
+          <li>点击“开始在网页中输入”按钮后，在页面中激活文本框，背景变为浅蓝色时开始录音。</li>
+          <li>默认情况下，语句停顿处自动结束录音；开启连续输入时，再次点击文本框结束录音。点击“结束在网页中输入”按钮，停止在网页中使用。</li>
+          <li>如果刷新网页，使用时需要再次点击“开始在网页中输入”按钮。</li>
           <li>仅支持 HTTPS 协议下运行的网页。对于不支持的网页，可以在插件中输入，然后复制到目标区域。</li>
           <li>不支持的文本框类型：密码等。</li>
           <li>尚未支持不使用标准输入元素 (input, textarea) 的文本框。</li>
         </ul>
       </div>
-      <div>转换效果：语音识别需要一点时间，文本显示可能略有延迟。为得到更好的识别效果，请您语速平稳，吐字清晰。</div>
+
       <div>源码：<a href="https://github.com/carolinezhao/speech-to-text">GitHub</a></div>
     </section>
     <section class="last">

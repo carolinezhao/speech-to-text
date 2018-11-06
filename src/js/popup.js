@@ -104,7 +104,7 @@ function showStartBtn(btn) {
 }
 
 function showStopBtn(btn) {
-  btn.value = "停止在网页中输入";
+  btn.value = "结束在网页中输入";
   btn.classList.add('stop-btn');
   btn.addEventListener('click', stopWorkInTab);
 }
