@@ -35,12 +35,23 @@ API:
 - `chrome.tabs.onUpdated.addListener`
 - `chrome.tabs.onRemoved.addListener`
 
+## options
+
+更改设置后，直接在 storage 中保存。
+
 ## storage
 
 - 麦克风权限
-- 连续输入设置
-- 语言设置
+  - 可通过地址栏图标和浏览器设置更改权限，插件页和每个网页都需要检查权限。
+- 连续输入和输入语言
+  - 在 options 页设置，都是语音识别对象的属性，在创建对象时读取设置。
 - 内容脚本的工作状态
+  - 当同时在多个页面中使用插件时，通过 tabId 的属性值判断当前页面可进行的操作。
+  - 安装插件时初始化 workInTab 对象；
+  - 在页面中运行内容脚本，将该页面的 tabId (一串数字) 作为属性添加到 workInTab 中，值为 true；
+  - 当停止内容脚本的工作，该属性值为 false；
+  - 关闭页面时，删除该页面的状态记录；
+  - 刷新页面时，内容脚本不再工作，但插件不会同步刷新，因此需要重启插件。
 
 API：
 - `chrome.storage.local.set`
@@ -95,3 +106,7 @@ navigator.mediaDevices.getUserMedia({
     }
   ]
 ```
+
+## bug
+
+对象中的属性值不是变量，只读取一次。
