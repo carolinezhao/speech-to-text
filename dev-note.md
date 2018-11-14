@@ -109,4 +109,11 @@ navigator.mediaDevices.getUserMedia({
 
 ## bug
 
-对象中的属性值不是变量，只读取一次。
+对象中的属性值不是变量，只读取一次。如果需要更新对象的属性值，可以通过函数返回对象。
+
+脚本中引用本地文件 (参考 popup 中的图片引用)
+- `import` 按照原始文件的相对路径 (不可缺少)
+- 使用时按照 build 目录中的相对路径
+- 也可以通过 `chrome.extension.getURL` 得到在插件中的绝对路径
+
+todo：刷新页面时，如果 tabId 为 true 则重启插件，在打包后的插件中不生效。
